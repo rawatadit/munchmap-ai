@@ -38,42 +38,40 @@ function App() {
   // Fetch restaurants on component mount
   useEffect(() => {
     /**
-     * Fetches restaurant data from backend API
-     * @param {number} lat - Latitude (defaults to San Francisco)
-     * @param {number} lng - Longitude (defaults to San Francisco)
+     * Fetches restaurant data from backend API - SIMPLIFIED FOR DEBUGGING
      */
-    const fetchRestaurants = async (lat = 37.7749, lng = -122.4194) => {
+    const fetchRestaurants = async () => {
       try {
-        // Call backend API directly (CORS enabled)
-        const res = await fetch(`http://localhost:3001/api/places?lat=${lat}&lng=${lng}`);
+        console.log('🔄 Starting API call...');
+        const res = await fetch('http://localhost:3001/api/places?lat=37.7749&lng=-122.4194');
+        console.log('📡 API response received, status:', res.status);
+        
         const data = await res.json();
+        console.log('📊 Raw data:', data);
+        
         let items = data.results || [];
+        console.log('🍽️ Number of restaurants:', items.length);
         
-        // Filter restaurants based on current time (breakfast/lunch/dinner)
-        const filter = getTimeFilter();
-        items = items.filter(r => {
-          const name = r.name.toLowerCase();
-          if (filter === 'breakfast') return name.includes('breakfast') || name.includes('cafe');
-          if (filter === 'lunch') return name.includes('lunch') || name.includes('cafe') || name.includes('deli');
-          return name.includes('dinner') || true; // Show all for dinner
-        });
-        
-        // Only show highly rated restaurants (4+ stars)
-        items = items.filter(r => r.rating >= 4);
+        // SIMPLIFIED FILTERING - Only remove truly bad restaurants
+        items = items.filter(r => r.rating && r.rating >= 3.5);
+        console.log('⭐ After basic filtering:', items.length);
         
         // Sort by rating (highest first)
         items.sort((a, b) => (b.rating || 0) - (a.rating || 0));
         
+        console.log('✅ Final restaurants to display:', items.length);
+        if (items.length > 0) {
+          console.log('🎯 First restaurant:', items[0].name, '-', items[0].rating, '⭐');
+        }
+        
         setRestaurants(items);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching restaurants:', error);
+        console.error('❌ API Error:', error);
         setLoading(false);
       }
     };
 
-    // Skip geolocation for now and use dummy data directly
-    // TODO: Add geolocation support with user permission handling
     fetchRestaurants();
   }, []);
 

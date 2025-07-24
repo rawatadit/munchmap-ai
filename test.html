@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+</head>
+<body>
+    <h1>🍽️ Restaurant API Test</h1>
+    <button onclick="testAPI()">Test API Call</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>🔄 Loading...</p>';
+            
+            try {
+                console.log('🔄 Starting API call...');
+                const response = await fetch('http://localhost:3001/api/places?lat=37.7749&lng=-122.4194');
+                console.log('📡 Response received:', response.status);
+                
+                const data = await response.json();
+                console.log('📊 Data:', data);
+                
+                const restaurants = data.results || [];
+                console.log(`🍽️ Found ${restaurants.length} restaurants`);
+                
+                let html = `<h2>✅ Success! Found ${restaurants.length} restaurants</h2><ul>`;
+                restaurants.slice(0, 5).forEach(r => {
+                    html += `<li><strong>${r.name}</strong> - ${r.rating}⭐ - ${r.vicinity}</li>`;
+                });
+                html += '</ul>';
+                
+                resultDiv.innerHTML = html;
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                resultDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
