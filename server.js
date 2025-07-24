@@ -15,6 +15,9 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 
+// Load environment variables from .env file
+require('dotenv').config();
+
 const app = express();
 
 // Enable CORS for all routes (allows frontend to call backend)
@@ -101,7 +104,7 @@ app.get('/api/places', async (req, res) => {
   
   // Toggle this to switch between dummy data and Google Places API
   // Set to false and add GOOGLE_API_KEY to .env to use real data
-  const useDummyData = true;
+  const useDummyData = false;
   
   if (useDummyData) {
     console.log('Returning dummy restaurant data for testing');
@@ -116,8 +119,7 @@ app.get('/api/places', async (req, res) => {
         key: GOOGLE_API_KEY,
         location: `${lat},${lng}`,
         radius: 1500,        // Search within 1.5km radius
-        type: 'restaurant',  // Only restaurants
-        opennow: true       // Only currently open restaurants
+        type: 'restaurant'   // Only restaurants (removed opennow restriction)
       }
     });
     res.json(response.data);

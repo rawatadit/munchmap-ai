@@ -125,8 +125,8 @@ function App() {
                 </div>
               ) : current.photos ? (
                 <img 
-                  src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${current.photos[0].photo_reference}&key=YOUR_API_KEY_HERE`} 
-                  alt={current.name} 
+                  src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${current.photos[0].photo_reference}&key=AIzaSyDZ0-QVftmk35e_-k2PR6olyQJFNzin8tc`} 
+                  alt={current.name}
                   onError={(e) => {
                     e.target.style.display = 'none';
                     e.target.nextSibling.style.display = 'block';
