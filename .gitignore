@@ -2,3 +2,12 @@ node_modules/
 client/node_modules/
 .env
 .DS_Store
+
+# Server logs
+server.log
+client.log
+client/client.log
+
+# Runtime files
+*.pid
+*.lock
