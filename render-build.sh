@@ -20,8 +20,23 @@ echo "Building client application..."
 cd client
 echo "Client directory listing:"
 ls -la
-npm install
-npm run build
+
+# Install all dependencies including devDependencies (needed for Vite)
+echo "Installing client dependencies (including devDependencies)..."
+npm install --include=dev
+
+# Verify Vite is available
+echo "Checking if Vite is available..."
+if npx vite --version; then
+    echo "Vite found successfully"
+else
+    echo "Vite not found, trying to install globally..."
+    npm install -g vite
+fi
+
+# Build using npx to ensure we use the local Vite installation
+echo "Building with Vite..."
+npx vite build
 cd ..
 
 # Debug the build output
