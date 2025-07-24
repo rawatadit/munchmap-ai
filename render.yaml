@@ -1,0 +1,15 @@
+services:
+  # A web service for the backend API
+  - type: web
+    name: restaurant-swipe-app
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GOOGLE_API_KEY
+        sync: false # Requires manual configuration in Render dashboard
+      - key: PORT
+        value: 3000 # Render requires port 3000

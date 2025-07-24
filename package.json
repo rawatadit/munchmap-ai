@@ -4,17 +4,36 @@
   "description": "Experimental repo for testing open-api codex agent",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "npm run test:unit && npm run test:ui",
+    "test:unit": "jest",
+    "test:ui": "playwright test",
+    "test:ui:debug": "playwright test --debug",
+    "test:ui:visual": "playwright test --update-snapshots",
+    "test:ui:report": "playwright show-report",
+    "test:ui:ui": "playwright test --ui",
+    "start": "node server.js",
+    "build": "cd client && npm install && npm run build",
+    "heroku-postbuild": "npm run build",
+    "render-postbuild": "npm run build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "axios": "^1.11.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.1",
+    "@types/jest": "^30.0.0",
+    "@types/supertest": "^6.0.3",
+    "axios": "^1.11.0",
+    "cross-env": "^7.0.3",
+    "jest": "^30.0.5",
+    "jest-environment-node": "^30.0.5",
+    "playwright": "^1.54.1",
+    "supertest": "^7.1.4"
   }
 }

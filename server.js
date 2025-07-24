@@ -14,6 +14,7 @@
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
+const path = require('path');
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -89,6 +90,7 @@ const dummyRestaurants = {
  * Query Parameters:
  * - lat: Latitude coordinate (float)
  * - lng: Longitude coordinate (float)
+ * - minRating: (optional) Minimum rating threshold (float, 1-5)
  * 
  * Response:
  * - results: Array of restaurant objects with place_id, name, rating, vicinity, price_level, photos
@@ -100,7 +102,12 @@ const dummyRestaurants = {
  * - CORS enabled for frontend access
  */
 app.get('/api/places', async (req, res) => {
-  const { lat, lng } = req.query;
+  const { lat, lng, minRating } = req.query;
+  
+  // Validate required parameters
+  if (!lat || !lng) {
+    return res.status(400).json({ error: 'Missing required parameters: lat and lng' });
+  }
   
   // Toggle this to switch between dummy data and Google Places API
   // Set to false and add GOOGLE_API_KEY to .env to use real data
@@ -108,8 +115,14 @@ app.get('/api/places', async (req, res) => {
   
   if (useDummyData) {
     console.log('Returning dummy restaurant data for testing');
-    res.json(dummyRestaurants);
-    return;
+    let results = dummyRestaurants.results;
+    
+    // Apply rating filter if specified
+    if (minRating) {
+      results = results.filter(restaurant => restaurant.rating >= parseFloat(minRating));
+    }
+    
+    return res.json({ results });
   }
   
   // Google Places API integration (requires valid API key)
@@ -122,13 +135,43 @@ app.get('/api/places', async (req, res) => {
         type: 'restaurant'   // Only restaurants (removed opennow restriction)
       }
     });
-    res.json(response.data);
+    
+    let results = response.data.results;
+    
+    // Apply rating filter if specified
+    if (minRating) {
+      results = results.filter(restaurant => restaurant.rating >= parseFloat(minRating));
+    }
+    
+    res.json({ results });
   } catch (error) {
     console.error('Google Places API error:', error.message);
     console.log('Falling back to dummy data');
-    res.json(dummyRestaurants);
+    let results = dummyRestaurants.results;
+    
+    // Apply rating filter if specified
+    if (minRating) {
+      results = results.filter(restaurant => restaurant.rating >= parseFloat(minRating));
+    }
+    
+    res.json({ results });
   }
 });
 
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React app
+  app.use(express.static(path.join(__dirname, 'client/dist')));
+
+  // The "catchall" handler: for any request that doesn't
+  // match one of our API routes, send back the React index.html file.
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client/dist/index.html'));
+  });
+}
+
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log('Server running on port', PORT));
+const server = app.listen(PORT, () => console.log('Server running on port', PORT));
+
+// Export server for testing
+module.exports = server;
